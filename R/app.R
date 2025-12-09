@@ -1785,7 +1785,7 @@ runCellChatApp <- function(object,...) {
   # ##########################################################################
   server <- function(input, output, session) {
     ############################################################################
-    prefix <- '~'
+    prefix <- '/Users/administrateur/Downloads'
     if (object@options$datatype == "RNA") {
       output$DimPlot <- plotly::renderPlotly({
         plotly_DimPlot(

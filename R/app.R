@@ -1302,9 +1302,11 @@ runCellChatApp <- function(object,...) {
         bslib::card_header(
           h6(tags$i(class="bi bi-bookmark"),
              "Open a file",class="h6")),
-        shinyFilesButton("files", "Choose file(s)",
+        shinyFilesButton("file", "Choose file(s)",
                          "Select a cellchat file",
                          multiple = F),
+        # Display selection
+        verbatimTextOutput("filepaths")
 
       ),
 
@@ -1813,6 +1815,26 @@ runCellChatApp <- function(object,...) {
       })
     }
 
+    volumes <- c(Home = "~",
+                 "R Installation" = R.home(),
+                 getVolumes()())
+    shinyFileChoose(input, "file", roots = volumes, session = session)
+
+    # Display selected directory
+    output$filepaths <- renderPrint({
+      if(!is.null(input$file)){
+        parseDirPath(volumes, input$dir)
+      }
+    })
+
+    observe({
+      if(!is.null(input$files)){
+        files <- parseFilePaths(volumes, input$files)
+        output$contents <- renderTable({
+          files
+        })
+      }
+    })
 
     observe({
       updateSelectizeInput(

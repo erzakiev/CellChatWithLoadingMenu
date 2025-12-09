@@ -1302,8 +1302,8 @@ runCellChatApp <- function(object,...) {
         bslib::card_header(
           h6(tags$i(class="bi bi-bookmark"),
              "Open a file",class="h6")),
-        shinyFiles::shinyFilesButton(id="file", "Choose file(s)",
-                         "Select a cellchat file",
+        shinyFiles::shinyFilesButton(id="file", label = "Choose a cellchat file",
+                                     "Select a cellchat file",
                          multiple = F),
         # Display selection
         verbatimTextOutput("filepaths")
@@ -1822,7 +1822,7 @@ runCellChatApp <- function(object,...) {
         input,
         "file",
         roots = c(home = prefix),
-        filetypes = c('rds','RDS'),
+        filetypes = c('rds','RDS', 'pdf')
       )
       return(parseFilePaths(c(home = prefix), input$file)$datapath)
     })
@@ -1835,7 +1835,9 @@ runCellChatApp <- function(object,...) {
     # Display selected directory
     output$filepaths <- renderPrint({
       if(!is.null(input$file)){
-        shinyFiles::parseFilePaths(c(home = prefix), input$file)$datapath
+        if(length(input$file)$datapath>0){
+          shinyFiles::parseFilePaths(c(home = prefix), input$file)$datapath
+        }
       }
     })
 

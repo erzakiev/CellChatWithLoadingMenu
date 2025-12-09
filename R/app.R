@@ -1837,6 +1837,8 @@ runCellChatApp <- function(object,...) {
       if(!is.null(input$file)){
         if(length(input$file)$datapath>0){
           shinyFiles::parseFilePaths(c(home = prefix), input$file)$datapath
+        } else {
+          return('...')
         }
       }
     })

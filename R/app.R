@@ -1817,7 +1817,7 @@ runCellChatApp <- function(object,...) {
     }
 
 
-    file_selected <- reactive({
+    file_selected <- observe({
       shinyFiles::shinyFileChoose(
         input,
         "file",

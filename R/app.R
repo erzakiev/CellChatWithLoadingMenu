@@ -1817,8 +1817,9 @@ runCellChatApp <- function(object,...) {
 
     volumes <- c(Home = "~",
                  "R Installation" = R.home(),
-                 shinyFiles::getVolumes()()[1])
-    shinyFiles::shinyFileChoose(input, "file", roots = volumes, session = session)
+                 Root=shinyFiles::getVolumes()()[1])
+    shinyFiles::shinyFileChoose(input, "file", roots = volumes, session = session,
+                                filetypes = c('rds', 'RDS'))
 
     # Display selected directory
     output$filepaths <- renderPrint({

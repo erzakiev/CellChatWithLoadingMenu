@@ -1302,9 +1302,9 @@ runCellChatApp <- function(object,...) {
         bslib::card_header(
           h6(tags$i(class="bi bi-bookmark"),
              "Open a file",class="h6")),
-        fileInput("file1", "Choose a cellchat object",
-                  multiple = FALSE,
-                  accept = c(".cellchat")),
+        shinyFilesButton("files", "Choose file(s)",
+                         "Select a cellchat file",
+                         multiple = F),
 
       ),
 

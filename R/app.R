@@ -1822,17 +1822,15 @@ runCellChatApp <- function(object,...) {
         input,
         "file",
         roots = c(home = prefix),
-        filetypes = c('rds','RDS', 'pdf')
+        filetypes = c('rds','RDS')
       )
-      return(shinyFiles::parseFilePaths(c(home = prefix), input$file)$datapath)
+      fl <- shinyFiles::parseFilePaths(c(home = prefix), input$file)$datapath
+      print('printing fl')
+      print(fl)
+      return(fl)
     })
 
-
-    volumes = c(
-      home = "~",
-      wd   = getwd()
-    )
-    # Display selected directory
+    # Display selected file
     output$filepaths <- renderPrint({
       if(!is.null(input$file)){
         if(length(input$file)>0){

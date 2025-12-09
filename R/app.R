@@ -1840,7 +1840,7 @@ runCellChatApp <- function(object,...) {
     })
 
     observe({
-      if(!is.null(input$file)){
+      if(length(input$file)>0){
         file <- shinyFiles::parseFilePaths(c(home = prefix), input$file)$datapath
         print(file)
         object <- readRDS(file)

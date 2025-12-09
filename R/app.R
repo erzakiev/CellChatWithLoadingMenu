@@ -1815,9 +1815,14 @@ runCellChatApp <- function(object,...) {
       })
     }
 
-    volumes <- c(Home = "~",
-                 "R Installation" = R.home(),
-                 Root=shinyFiles::getVolumes()()[1])
+    #volumes <- c(Home = "~",
+    #             "R Installation" = R.home(),
+    #             Root=shinyFiles::getVolumes()()[1])
+
+    roots = c(
+      home = "~",
+      wd   = getwd()
+    )
     shinyFiles::shinyFileChoose(input, "file", roots = volumes, session = session,
                                 filetypes = c('rds', 'RDS'))
 
@@ -1825,6 +1830,7 @@ runCellChatApp <- function(object,...) {
     output$filepaths <- renderPrint({
       if(!is.null(input$file)){
         shinyFiles::parseFilePaths(volumes, input$file)
+        print(input$file)
       }
     })
 

@@ -1834,7 +1834,7 @@ runCellChatApp <- function(object,...) {
     output$filepaths <- renderPrint({
       if(!is.null(input$file)){
         if(length(input$file)>0){
-          shinyFiles::parseFilePaths(c(home = prefix), input$file)$datapath
+          cat(as.character(shinyFiles::parseFilePaths(c(home = prefix), input$file)$datapath))
         } else {
           return('...')
         }

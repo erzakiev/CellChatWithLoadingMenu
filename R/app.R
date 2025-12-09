@@ -6,8 +6,8 @@
 #' @export
 #' @importFrom stringr str_split_1
 # #' @importFrom plotly subplot plot_ly ggplotly add_markers highlight highlight_key plotlyOutput layout
-# #' @importFrom bsicons bs_icon shinyFiles
-#' @import shiny bslib
+# #' @importFrom bsicons bs_icon
+#' @import shiny bslib shinyFiles
 #'
 runCellChatApp <- function(object,...) {
   # ##########################################################################
@@ -1823,16 +1823,14 @@ runCellChatApp <- function(object,...) {
     # Display selected directory
     output$filepaths <- renderPrint({
       if(!is.null(input$file)){
-        parseDirPath(volumes, input$dir)
+        parseFilePaths(volumes, input$file)
       }
     })
 
     observe({
-      if(!is.null(input$files)){
-        files <- parseFilePaths(volumes, input$files)
-        output$contents <- renderTable({
-          files
-        })
+      if(!is.null(input$file)){
+        file <- parseFilePaths(volumes, input$file)
+        object <- readRDS(file)
       }
     })
 

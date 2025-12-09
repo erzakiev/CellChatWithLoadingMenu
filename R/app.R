@@ -1848,7 +1848,9 @@ runCellChatApp <- function(object,...) {
         print(length(file))
         print('printing wd')
         print(getwd())
-        object <- readRDS(file)
+        if(length(file)>0){
+          object <- readRDS(file)
+        }
       }
     })
 

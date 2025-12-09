@@ -1289,6 +1289,26 @@ runCellChatApp <- function(object,...) {
                    )
 
                )),
+
+
+      # ##########################################################################
+      # 0.Importation of a dataset
+      # ##########################################################################
+
+      # Visualize cell groups and signaling expression
+      h3(tags$i(class="bi bi-1-square-fill"),
+         "Open a dataset",class="h3"),
+      bslib::card(
+        bslib::card_header(
+          h6(tags$i(class="bi bi-bookmark"),
+             "Open a file",class="h6")),
+        fileInput("file1", "Choose a cellchat object",
+                  multiple = FALSE,
+                  accept = c(".cellchat")),
+
+      ),
+
+
       # ##########################################################################
       # 1.Basic exploration of spatial-resolved gene expression
       # ##########################################################################

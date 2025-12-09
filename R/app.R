@@ -1302,7 +1302,7 @@ runCellChatApp <- function(object,...) {
         bslib::card_header(
           h6(tags$i(class="bi bi-bookmark"),
              "Open a file",class="h6")),
-        shinyFiles::shinyFilesButton("file", "Choose file(s)",
+        shinyFiles::shinyFilesButton(id="file", "Choose file(s)",
                          "Select a cellchat file",
                          multiple = F),
         # Display selection
@@ -1785,6 +1785,7 @@ runCellChatApp <- function(object,...) {
   # ##########################################################################
   server <- function(input, output, session) {
     ############################################################################
+    prefix <- '~'
     if (object@options$datatype == "RNA") {
       output$DimPlot <- plotly::renderPlotly({
         plotly_DimPlot(
@@ -1815,27 +1816,32 @@ runCellChatApp <- function(object,...) {
       })
     }
 
-    #volumes <- c(Home = "~",
-    #             "R Installation" = R.home(),
-    #             Root=shinyFiles::getVolumes()()[1])
+
+    file_selected <- reactive({
+      shinyFiles::shinyFileChoose(
+        input,
+        "file",
+        roots = c(home = prefix),
+        filetypes = c('rds','RDS'),
+      )
+      return(parseFilePaths(c(home = prefix), input$file)$datapath)
+    })
+
 
     volumes = c(
       home = "~",
       wd   = getwd()
     )
-    shinyFiles::shinyFileChoose(input, "file",
-                                filetypes = c('rds', 'RDS'))
-
     # Display selected directory
     output$filepaths <- renderPrint({
       if(!is.null(input$file)){
-        shinyFiles::parseFilePaths(volumes, input$file)
+        shinyFiles::parseFilePaths(c(home = prefix), input$file)$datapath
       }
     })
 
     observe({
       if(!is.null(input$file)){
-        file <- shinyFiles::parseFilePaths(volumes, input$file)
+        file <- shinyFiles::parseFilePaths(c(home = prefix), input$file)$datapath
         print(file)
         object <- readRDS(file)
       }

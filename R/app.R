@@ -6,7 +6,7 @@
 #' @export
 #' @importFrom stringr str_split_1
 # #' @importFrom plotly subplot plot_ly ggplotly add_markers highlight highlight_key plotlyOutput layout
-# #' @importFrom bsicons bs_icon
+# #' @importFrom bsicons bs_icon shinyFiles
 #' @import shiny bslib
 #'
 runCellChatApp <- function(object,...) {

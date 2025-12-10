@@ -15,36 +15,17 @@ runCellChatApp <- function(object,...) {
   # ##########################################################################
   options(stringsAsFactors = FALSE)
 
-  # ##########################################################################
-  # some useful elements for ui.R
-  # ##########################################################################
-  choices_cell_groups <-levels(object@idents)
-  names(choices_cell_groups) <- levels(object@idents)
-
-  choices_pathways <- object@netP$pathways
-  names(choices_pathways) <- object@netP$pathways
-
-  # all signaling gene names
-  choices_gene_names <- CellChat::extractGene(object@DB)
-  # all ligand-receptor pair names
-  #choices_pairLR_use <- object@DB$interaction$interaction_name
-  if ("LRs" %in% names(object@net)) {
-    choices_pairLR_use <- object@net$LRs
-  } else {
-    thresh = 0.05
-    prob <- object@net$prob
-    prob[object@net$pval > thresh] <- 0
-    LR <- dimnames(prob)[[3]]
-    LR.sig <- LR[apply(prob, 3, sum) != 0]
-    choices_pairLR_use <- LR.sig
-  }
-
-
   # Palettes (sequential)
   choices_palettes_sequential <- stringr::str_split_1("Blues, BuGn, BuPu, GnBu, Greens, Greys, Oranges, OrRd, PuBu, PuBuGn, PuRd, Purples, RdPu, Reds, YlGn, YlGnBu, YlOrBr, YlOrRd",", ")
   names(choices_palettes_sequential) <- choices_palettes_sequential
   choices_palettes_diverging <- stringr::str_split_1("BrBG, PiYG, PRGn, PuOr, RdBu, RdGy, RdYlBu, RdYlGn, Spectral",", ")
   names(choices_palettes_diverging) <- choices_palettes_diverging
+
+
+  # ##########################################################################
+  # some useful elements for ui.R
+
+
 
   # ##########################################################################
   # interactive visualization
@@ -1786,8 +1767,7 @@ runCellChatApp <- function(object,...) {
   server <- function(input, output, session) {
     ############################################################################
     prefix <- '/Users/administrateur/Downloads'
-
-    object <- reactive({
+    object_r <- reactive({
       # Use req() to return NULL initially if no input yet
       # Or provide a default directly
       if (length(input$file)>0) {
@@ -1811,12 +1791,35 @@ runCellChatApp <- function(object,...) {
 
 
 
+    # ##########################################################################
+    choices_cell_groups <-levels(object_r()@idents)
+    names(choices_cell_groups) <- levels(object_r()@idents)
+
+    choices_pathways <- object_r()@netP$pathways
+    names(choices_pathways) <- object_r()@netP$pathways
+
+    # all signaling gene names
+    choices_gene_names <- CellChat::extractGene(object_r()@DB)
+    # all ligand-receptor pair names
+    #choices_pairLR_use <- object_r()@DB$interaction$interaction_name
+    if ("LRs" %in% names(object_r()@net)) {
+      choices_pairLR_use <- object_r()@net$LRs
+    } else {
+      thresh = 0.05
+      prob <- object_r()@net$prob
+      prob[object_r()@net$pval > thresh] <- 0
+      LR <- dimnames(prob)[[3]]
+      LR.sig <- LR[apply(prob, 3, sum) != 0]
+      choices_pairLR_use <- LR.sig
+    }
 
 
-    if (object@options$datatype == "RNA") {
+
+
+    if (object_r()@options$datatype == "RNA") {
       output$DimPlot <- plotly::renderPlotly({
         plotly_DimPlot(
-          object,
+          object_r(),
           point.size = input$dimplot_point_size,
           alpha = input$dimplot_alpha,
         ) %>%
@@ -1830,7 +1833,7 @@ runCellChatApp <- function(object,...) {
     } else {
       output$spatialDimPlot <- plotly::renderPlotly({
         plotly_spatialDimPlot(
-          object,
+          object_r(),
           point.size = input$dimplot_point_size,
           alpha = input$dimplot_alpha,
         ) %>%
@@ -1879,9 +1882,9 @@ runCellChatApp <- function(object,...) {
         print(length(file))
         print('printing wd')
         print(getwd())
-        if(length(file)>0){
-          object <- readRDS(file)
-        }
+        #if(length(file)>0){
+        #  object <- readRDS(file)
+        #}
       }
     })
 
@@ -1899,9 +1902,9 @@ runCellChatApp <- function(object,...) {
     })
     # output$out6 <- renderPrint(input$selectize_gene_names)
 
-    if (object@options$datatype == "RNA") {
+    if (object_r()@options$datatype == "RNA") {
       output$gene_expression_distribution <- plotly::renderPlotly(plotly_FeaturePlot(
-        object,
+        object_r(),
         features = input$selectize_gene_names,
         plot_nrows = input$nrows_feature_plot1,
         point.size = input$point.size_feature_plot1,
@@ -1918,7 +1921,7 @@ runCellChatApp <- function(object,...) {
       )
     } else {
       output$gene_expression_distribution <- plotly::renderPlotly(plotly_spatialFeaturePlot(
-        object,
+        object_r(),
         features = input$selectize_gene_names,
         plot_nrows = input$nrows_feature_plot1,
         point.size = input$point.size_feature_plot1,
@@ -1947,10 +1950,10 @@ runCellChatApp <- function(object,...) {
       )
     })
     # output$out7 <- renderPrint(input$selectize_pairLR_use)
-    if (object@options$datatype == "RNA") {
+    if (object_r()@options$datatype == "RNA") {
       output$gene_expression_distribution2 <- plotly::renderPlotly({
         plotly_FeaturePlot(
-          object,
+          object_r(),
           pairLR.use = input$selectize_pairLR_use,
           point.size = input$point.size_feature_plot2,
           do.binary = input$do.binary_feature_plot,
@@ -1970,7 +1973,7 @@ runCellChatApp <- function(object,...) {
     } else {
       output$gene_expression_distribution2 <- plotly::renderPlotly({
         plotly_spatialFeaturePlot(
-          object,
+          object_r(),
           pairLR.use = input$selectize_pairLR_use,
           point.size = input$point.size_feature_plot2,
           do.binary = input$do.binary_feature_plot,
@@ -1993,7 +1996,7 @@ runCellChatApp <- function(object,...) {
     ############################################################################
     output$netVisual_heatmap <- plotly::renderPlotly({
       suppressWarnings({
-        netVisual_heatmap(object,
+        netVisual_heatmap(object_r(),
                           measure = input$measure_heatmap,
         ) %>%
           plotly_netVisual_heatmap(
@@ -2004,7 +2007,7 @@ runCellChatApp <- function(object,...) {
 
     output$rankNet <- plotly::renderPlotly({
       rankNet(
-        object,
+        object_r(),
         mode = "single",
         measure = "weight",
         sources.use = input$select1_cell_group,
@@ -2016,7 +2019,7 @@ runCellChatApp <- function(object,...) {
 
     output$netAnalysis_contribution <- renderPlot({
       netAnalysis_contribution(
-        object,
+        object_r(),
         signaling = input$pathway_contribution_plot,
         sources.use = input$select3_cell_group,
         targets.use = input$select4_cell_group,
@@ -2036,7 +2039,7 @@ runCellChatApp <- function(object,...) {
     })
     output$Circle_plot <- renderPlot({
       netVisual_aggregate(
-        object,
+        object_r(),
         signaling = input$selectize_pathway,
         layout = "circle",
         edge.width.max = input$slider_Circle_plot_edge.width.max,
@@ -2046,7 +2049,7 @@ runCellChatApp <- function(object,...) {
     },res = 96)
     output$Spatial_plot <- renderPlot({
       netVisual_aggregate(
-        object,
+        object_r(),
         signaling = input$selectize_pathway,
         layout = "spatial",
         edge.width.max = input$slider_Spatial_plot_edge.width.max,
@@ -2058,7 +2061,7 @@ runCellChatApp <- function(object,...) {
     })
     output$LR_pair_contribution <- plotly::renderPlotly({
       netAnalysis_contribution(
-        object,
+        object_r(),
         signaling = input$selectize_pathway,
         font.size = 12,
         font.size.title = 14

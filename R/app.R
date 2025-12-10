@@ -2021,7 +2021,7 @@ runCellChatApp <- function(object,...) {
       })
     }
 
-
+    print('line 2024 ok')
     ############################################################################
     output$netVisual_heatmap <- plotly::renderPlotly({
       suppressWarnings({
@@ -2033,7 +2033,7 @@ runCellChatApp <- function(object,...) {
             direction.heatmap = input$direction_heatmap)
       })
     })
-
+    print('line 2036 ok')
     output$rankNet <- plotly::renderPlotly({
       rankNet(
         object_r(),
@@ -2045,7 +2045,7 @@ runCellChatApp <- function(object,...) {
       ) %>%
         plotly::ggplotly()
     })
-
+    print('line 2048 ok')
     output$netAnalysis_contribution <- renderPlot({
       netAnalysis_contribution(
         object_r(),
@@ -2057,6 +2057,7 @@ runCellChatApp <- function(object,...) {
       )
     }, res = 96)
     ############################################################################
+    print('line 2060 ok')
     output$Circle_plot <- renderPlot({
       netVisual_aggregate(
         object_r(),
@@ -2067,6 +2068,7 @@ runCellChatApp <- function(object,...) {
         vertex.label.cex = input$slider_Circle_plot_vertex.label.cex
       )
     },res = 96)
+    print('line 2071 ok')
     output$Spatial_plot <- renderPlot({
       netVisual_aggregate(
         object_r(),
@@ -2079,6 +2081,7 @@ runCellChatApp <- function(object,...) {
         point.size = input$slider_Spatial_plot_point.size,
       )
     })
+    print('line 2084 ok')
     output$LR_pair_contribution <- plotly::renderPlotly({
       netAnalysis_contribution(
         object_r(),

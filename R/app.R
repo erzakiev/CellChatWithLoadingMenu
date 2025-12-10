@@ -1598,23 +1598,22 @@ runCellChatApp <- function(object,...) {
                         selectInput(
                           "pathway_contribution_plot",
                           label = "a pathway to show",
-                          choices = choices_pathways,
-                          selected = choices_pathways[1]
+                          choices = NULL #choices_pathways,
+                          #selected = choices_pathways[1]
                         ),
                         selectInput(
                           "select3_cell_group",
                           label = "a cell group for sources.use",
-                          choices = choices_cell_groups,
-                          selected = choices_cell_groups[1]
+                          choices = NULL # choices_cell_groups,
+                          #selected = choices_cell_groups[1]
                         ),
                         selectInput(
                           "select4_cell_group",
                           label = "a cell group for targets.use",
-                          choices = choices_cell_groups,
-                          selected = choices_cell_groups[2]
+                          choices = NULL #choices_cell_groups,
+                          # selected = choices_cell_groups[2]
                         ),
                       ),
-
                       accordion_panel(
                         title = "Numerical",
                         icon = bsicons::bs_icon("sliders"),
@@ -1789,40 +1788,67 @@ runCellChatApp <- function(object,...) {
       }
     })
 
-    observeEvent(object_r(), {
-      req(object_r())
-
-      choices <- unique(object_r()$cell_groups)  # Adjust this line!
-
-      # Update the selectInput
-      updateSelectInput(
-        session,
-        "select1_cell_group",
-        choices = choices_cell_groups,
-        selected = choices[1]
-      )
-    })
-
-    observeEvent(object_r(), {
-      req(object_r())
-
-      choices <- unique(object_r()$cell_groups)  # Adjust this line!
-
-      # Update the selectInput
-      updateSelectInput(
-        session,
-        "select2_cell_group",
-        choices = choices_cell_groups,
-        selected = choices[2]
-      )
-    })
-
-    # ##########################################################################
     choices_cell_groups <-levels(object_r()@idents)
     names(choices_cell_groups) <- levels(object_r()@idents)
 
     choices_pathways <- object_r()@netP$pathways
     names(choices_pathways) <- object_r()@netP$pathways
+
+
+    observeEvent(object_r(), {
+      req(object_r())
+      # Update the selectInput
+      updateSelectInput(
+        session,
+        "select1_cell_group",
+        choices = choices_cell_groups,
+        selected = choices_cell_groups[1]
+      )
+    })
+
+    observeEvent(object_r(), {
+      req(object_r())
+      # Update the selectInput
+      updateSelectInput(
+        session,
+        "select2_cell_group",
+        choices = choices_cell_groups,
+        selected = choices_cell_groups[2]
+      )
+    })
+
+    observeEvent(object_r(), {
+      req(object_r())
+      # Update the selectInput
+      updateSelectInput(
+        session,
+        "pathway_contribution_plot",
+        choices = choices_pathways,
+        selected = choices_pathways[1]
+      )
+    })
+    observeEvent(object_r(), {
+      req(object_r())
+      # Update the selectInput
+      updateSelectInput(
+        session,
+        "select3_cell_group",
+        choices = choices_cell_groups,
+        selected = choices_cell_groups[2]
+      )
+    })
+    observeEvent(object_r(), {
+      req(object_r())
+      # Update the selectInput
+      updateSelectInput(
+        session,
+        "select4_cell_group",
+        choices = choices_cell_groups,
+        selected = choices_cell_groups[2]
+      )
+    })
+
+    # ##########################################################################
 
     # all signaling gene names
     choices_gene_names <- CellChat::extractGene(object_r()@DB)

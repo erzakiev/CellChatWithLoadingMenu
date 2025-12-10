@@ -1980,6 +1980,7 @@ runCellChatApp <- function(object,...) {
     print('line 1980 ok')
     # output$out7 <- renderPrint(input$selectize_pairLR_use)
     if (object_r()@options$datatype == "RNA") {
+      print('line 1983 ok')
       output$gene_expression_distribution2 <- plotly::renderPlotly({
         plotly_FeaturePlot(
           object_r(),
@@ -2000,6 +2001,7 @@ runCellChatApp <- function(object,...) {
           ))
       })
     } else {
+      print('line 2004 ok')
       output$gene_expression_distribution2 <- plotly::renderPlotly({
         plotly_spatialFeaturePlot(
           object_r(),

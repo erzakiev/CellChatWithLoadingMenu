@@ -1769,7 +1769,7 @@ runCellChatApp <- function(object,...) {
     object_r <- reactive({
       # Use req() to return NULL initially if no input yet
       # Or provide a default directly
-      if (length(input$file)>0) {
+      if (length(input$file) > 0) {
         shinyFiles::shinyFileChoose(
           input,
           "file",
@@ -1777,9 +1777,7 @@ runCellChatApp <- function(object,...) {
           filetypes = c('rds','RDS')
         )
         fl <- shinyFiles::parseFilePaths(c(home = prefix), input$file)$datapath
-        print('printing fl')
-        print(fl)
-        if(length(fl)>0){
+        if(length(fl) > 0){
           readRDS(as.character(fl))
         } else {object}
       } else {
@@ -1788,21 +1786,46 @@ runCellChatApp <- function(object,...) {
       }
     })
 
-    choices_cell_groups <-levels(object_r()@idents)
-    names(choices_cell_groups) <- levels(object_r()@idents)
+    # FIXED: Make these reactive expressions
+    choices_cell_groups <- reactive({
+      req(object_r())  # Wait for object to exist
+      levels(object_r()@idents)
+    })
 
-    choices_pathways <- object_r()@netP$pathways
-    names(choices_pathways) <- object_r()@netP$pathways
+    choices_pathways <- reactive({
+      req(object_r())  # Wait for object to exist
+      object_r()@netP$pathways
+    })
 
+    # Also fix these - make them reactive
+    choices_gene_names <- reactive({
+      req(object_r())
+      CellChat::extractGene(object_r()@DB)
+    })
 
+    choices_pairLR_use <- reactive({
+      req(object_r())
+      if ("LRs" %in% names(object_r()@net)) {
+        object_r()@net$LRs
+      } else {
+        thresh = 0.05
+        prob <- object_r()@net$prob
+        prob[object_r()@net$pval > thresh] <- 0
+        LR <- dimnames(prob)[[3]]
+        LR.sig <- LR[apply(prob, 3, sum) != 0]
+        LR.sig
+      }
+    })
+
+    # Now update observers to use the reactive expressions
     observeEvent(object_r(), {
       req(object_r())
       # Update the selectInput
       updateSelectInput(
         session,
         "select1_cell_group",
-        choices = choices_cell_groups,
-        selected = choices_cell_groups[1]
+        choices = choices_cell_groups(),
+        selected = choices_cell_groups()[1]
       )
     })
 
@@ -1812,8 +1835,8 @@ runCellChatApp <- function(object,...) {
       updateSelectInput(
         session,
         "select2_cell_group",
-        choices = choices_cell_groups,
-        selected = choices_cell_groups[2]
+        choices = choices_cell_groups(),
+        selected = choices_cell_groups()[2]
       )
     })
 
@@ -1823,53 +1846,73 @@ runCellChatApp <- function(object,...) {
       updateSelectInput(
         session,
         "pathway_contribution_plot",
-        choices = choices_pathways,
-        selected = choices_pathways[1]
+        choices = choices_pathways(),
+        selected = choices_pathways()[1]
       )
     })
+
     observeEvent(object_r(), {
       req(object_r())
       # Update the selectInput
       updateSelectInput(
         session,
         "select3_cell_group",
-        choices = choices_cell_groups,
-        selected = choices_cell_groups[2]
+        choices = choices_cell_groups(),
+        selected = choices_cell_groups()[2]
       )
     })
+
     observeEvent(object_r(), {
       req(object_r())
       # Update the selectInput
       updateSelectInput(
         session,
         "select4_cell_group",
-        choices = choices_cell_groups,
-        selected = choices_cell_groups[2]
+        choices = choices_cell_groups(),
+        selected = choices_cell_groups()[2]
       )
     })
 
-    # ##########################################################################
+    # Also fix the selectize observers
+    observe({
+      req(object_r())
+      updateSelectizeInput(
+        session,
+        "selectize_gene_names",
+        selected = choices_gene_names()[1:2],
+        choices = choices_gene_names(),  # FIXED: Use choices_gene_names() not choices_cell_groups
+        server = TRUE
+      )
+    })
 
-    # all signaling gene names
-    choices_gene_names <- CellChat::extractGene(object_r()@DB)
-    # all ligand-receptor pair names
-    #choices_pairLR_use <- object_r()@DB$interaction$interaction_name
-    if ("LRs" %in% names(object_r()@net)) {
-      choices_pairLR_use <- object_r()@net$LRs
-    } else {
-      thresh = 0.05
-      prob <- object_r()@net$prob
-      prob[object_r()@net$pval > thresh] <- 0
-      LR <- dimnames(prob)[[3]]
-      LR.sig <- LR[apply(prob, 3, sum) != 0]
-      choices_pairLR_use <- LR.sig
-    }
+    observe({
+      req(object_r())
+      updateSelectizeInput(
+        session,
+        "selectize_pairLR_use",
+        selected = choices_pairLR_use()[1],
+        choices = choices_pairLR_use(),
+        server = TRUE
+      )
+    })
 
+    # Fix pathway selectize input too
+    observe({
+      req(object_r())
+      updateSelectizeInput(
+        session,
+        "selectize_pathway",
+        selected = choices_pathways()[1],
+        choices = choices_pathways(),
+        server = TRUE
+      )
+    })
 
+    # Also fix the condition check for datatype - it needs to be inside a reactive context
+    output$DimPlot <- plotly::renderPlotly({
+      req(object_r())
 
-
-    if (object_r()@options$datatype == "RNA") {
-      output$DimPlot <- plotly::renderPlotly({
+      if (object_r()@options$datatype == "RNA") {
         plotly_DimPlot(
           object_r(),
           point.size = input$dimplot_point_size,
@@ -1881,9 +1924,7 @@ runCellChatApp <- function(object,...) {
             width = 800,
             height = 600
           ))
-      })
-    } else {
-      output$spatialDimPlot <- plotly::renderPlotly({
+      } else {
         plotly_spatialDimPlot(
           object_r(),
           point.size = input$dimplot_point_size,
@@ -1895,112 +1936,48 @@ runCellChatApp <- function(object,...) {
             width = 800,
             height = 600
           ))
-      })
-    }
-
-
-  #  file_selected <- observe({
-  #    shinyFiles::shinyFileChoose(
-  #      input,
-  #      "file",
-  #      roots = c(home = prefix),
-  #      filetypes = c('rds','RDS')
-  #    )
-  #    fl <- shinyFiles::parseFilePaths(c(home = prefix), input$file)$datapath
-  #    print('printing fl')
-  #    print(fl)
-  #    if(length(fl)>0) object <<- readRDS(as.character(fl))
-  #    return(fl)
-  #  })
-
-
-    # Display selected file
-    output$filepaths <- renderPrint({
-      if(!is.null(input$file)){
-        if(length(input$file)>0){
-          cat(as.character(shinyFiles::parseFilePaths(c(home = prefix), input$file)$datapath))
-        } else {
-          return('...')
-        }
       }
     })
 
-    observe({
-      if(length(input$file)>0){
-        file <- shinyFiles::parseFilePaths(c(home = prefix), input$file)$datapath
-        print('printing file')
-        print(file)
-        print('printing length of file')
-        print(length(file))
-        print('printing wd')
-        print(getwd())
-        #if(length(file)>0){
-        #  object <- readRDS(file)
-        #}
+    # Also fix the other conditional outputs
+    output$gene_expression_distribution <- plotly::renderPlotly({
+      req(object_r())
+
+      if (object_r()@options$datatype == "RNA") {
+        plotly_FeaturePlot(
+          object_r(),
+          features = input$selectize_gene_names,
+          plot_nrows = input$nrows_feature_plot1,
+          point.size = input$point.size_feature_plot1,
+          cutoff = input$cut.off_feature_plot1,
+          color.heatmap = input$palette_feature_plot1,
+          direction = input$direction_feature_plot1,
+        ) %>%
+          plotly::config(toImageButtonOptions = list(
+            format = "svg",
+            filename = "FeaturePlot (use gene names)",
+            width = 600,
+            height = 600
+          ))
+      } else {
+        plotly_spatialFeaturePlot(
+          object_r(),
+          features = input$selectize_gene_names,
+          plot_nrows = input$nrows_feature_plot1,
+          point.size = input$point.size_feature_plot1,
+          cutoff = input$cut.off_feature_plot1,
+          color.heatmap = input$palette_feature_plot1,
+          direction = input$direction_feature_plot1,
+        ) %>%
+          plotly::config(toImageButtonOptions = list(
+            format = "svg",
+            filename = "spatialFeaturePlot (use gene names)",
+            width = 600,
+            height = 600
+          ))
       }
     })
 
-    observe({
-      updateSelectizeInput(
-        session,
-        "selectize_gene_names",
-        # selected = c("Wnt10a", "Fzd1", "Lrp6"),
-        selected = choices_gene_names[1:2],
-        # selected = c("Wnt10a", "Fzd1", "Lrp6","Ror2",
-        #              "Nrp1","Nrp2","Bmpr2","Ret"),
-        choices = choices_cell_groups,
-        server = TRUE
-      )
-    })
-    # output$out6 <- renderPrint(input$selectize_gene_names)
-
-    if (object_r()@options$datatype == "RNA") {
-      output$gene_expression_distribution <- plotly::renderPlotly(plotly_FeaturePlot(
-        object_r(),
-        features = input$selectize_gene_names,
-        plot_nrows = input$nrows_feature_plot1,
-        point.size = input$point.size_feature_plot1,
-        cutoff = input$cut.off_feature_plot1,
-        color.heatmap = input$palette_feature_plot1,
-        direction = input$direction_feature_plot1,
-      ) %>%
-        plotly::config(toImageButtonOptions = list(
-          format = "svg",
-          filename = "FeaturePlot (use gene names)",
-          width = 600,
-          height = 600
-        ))
-      )
-    } else {
-      output$gene_expression_distribution <- plotly::renderPlotly(plotly_spatialFeaturePlot(
-        object_r(),
-        features = input$selectize_gene_names,
-        plot_nrows = input$nrows_feature_plot1,
-        point.size = input$point.size_feature_plot1,
-        cutoff = input$cut.off_feature_plot1,
-        color.heatmap = input$palette_feature_plot1,
-        direction = input$direction_feature_plot1,
-      ) %>%
-        plotly::config(toImageButtonOptions = list(
-          format = "svg",
-          filename = "spatialFeaturePlot (use gene names)",
-          width = 600,
-          height = 600
-        ))
-      )
-    }
-
-
-    observe({
-      updateSelectizeInput(
-        session,
-        "selectize_pairLR_use",
-        selected = choices_pairLR_use[1],
-        # selected = c("WNT10A_FZD1_LRP6","WNT10A_FZD10_LRP6","BMP2_BMPR1A_ACVR2A"),
-        choices = choices_pairLR_use,
-        server = TRUE
-      )
-    })
     # output$out7 <- renderPrint(input$selectize_pairLR_use)
     if (object_r()@options$datatype == "RNA") {
       output$gene_expression_distribution2 <- plotly::renderPlotly({

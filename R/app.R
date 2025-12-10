@@ -2055,17 +2055,8 @@ runCellChatApp <- function(object,...) {
         font.size = input$font.size_contribution_plot,
         font.size.title = input$font.size_contribution_plot,
       )
-    },res = 96)
+    }, res = 96)
     ############################################################################
-    observe({
-      updateSelectizeInput(
-        session,
-        "selectize_pathway",
-        selected = choices_pathways[1],
-        choices = choices_pathways,
-        server = TRUE
-      )
-    })
     output$Circle_plot <- renderPlot({
       netVisual_aggregate(
         object_r(),

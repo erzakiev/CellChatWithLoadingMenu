@@ -1786,6 +1786,33 @@ runCellChatApp <- function(object,...) {
   server <- function(input, output, session) {
     ############################################################################
     prefix <- '/Users/administrateur/Downloads'
+
+    object <- reactive({
+      # Use req() to return NULL initially if no input yet
+      # Or provide a default directly
+      if (length(input$file)>0) {
+        shinyFiles::shinyFileChoose(
+          input,
+          "file",
+          roots = c(home = prefix),
+          filetypes = c('rds','RDS')
+        )
+        fl <- shinyFiles::parseFilePaths(c(home = prefix), input$file)$datapath
+        print('printing fl')
+        print(fl)
+        if(length(fl)>0){
+          readRDS(as.character(fl))
+        } else {object}
+      } else {
+        # default object
+        object
+      }
+    })
+
+
+
+
+
     if (object@options$datatype == "RNA") {
       output$DimPlot <- plotly::renderPlotly({
         plotly_DimPlot(
@@ -1817,19 +1844,19 @@ runCellChatApp <- function(object,...) {
     }
 
 
-    file_selected <- observe({
-      shinyFiles::shinyFileChoose(
-        input,
-        "file",
-        roots = c(home = prefix),
-        filetypes = c('rds','RDS')
-      )
-      fl <- shinyFiles::parseFilePaths(c(home = prefix), input$file)$datapath
-      print('printing fl')
-      print(fl)
-      if(length(fl)>0) object <<- readRDS(as.character(fl))
-      return(fl)
-    })
+  #  file_selected <- observe({
+  #    shinyFiles::shinyFileChoose(
+  #      input,
+  #      "file",
+  #      roots = c(home = prefix),
+  #      filetypes = c('rds','RDS')
+  #    )
+  #    fl <- shinyFiles::parseFilePaths(c(home = prefix), input$file)$datapath
+  #    print('printing fl')
+  #    print(fl)
+  #    if(length(fl)>0) object <<- readRDS(as.character(fl))
+  #    return(fl)
+  #  })
 
 
     # Display selected file

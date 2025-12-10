@@ -1549,15 +1549,15 @@ runCellChatApp <- function(object,...) {
                         selectInput(
                           "select1_cell_group",
                           label = "cell groups for sources.use",
-                          choices = choices_cell_groups,
-                          selected = choices_cell_groups[1],
+                          choices = NULL,
+                          #selected = choices_cell_groups[1],
                           multiple = TRUE
                         ),
                         selectInput(
                           "select2_cell_group",
                           label = "cell groups for targets.use",
-                          choices = choices_cell_groups,
-                          selected = choices_cell_groups[2],
+                          choices = NULL,
+                          #selected = choices_cell_groups[2],
                           multiple = TRUE
                         ),
 
@@ -1789,7 +1789,33 @@ runCellChatApp <- function(object,...) {
       }
     })
 
+    observeEvent(object_r(), {
+      req(object_r())
 
+      choices <- unique(object_r()$cell_groups)  # Adjust this line!
+
+      # Update the selectInput
+      updateSelectInput(
+        session,
+        "select1_cell_group",
+        choices = choices_cell_groups,
+        selected = choices[1]
+      )
+    })
+
+    observeEvent(object_r(), {
+      req(object_r())
+
+      choices <- unique(object_r()$cell_groups)  # Adjust this line!
+
+      # Update the selectInput
+      updateSelectInput(
+        session,
+        "select2_cell_group",
+        choices = choices_cell_groups,
+        selected = choices[2]
+      )
+    })
 
     # ##########################################################################
     choices_cell_groups <-levels(object_r()@idents)
@@ -1896,7 +1922,7 @@ runCellChatApp <- function(object,...) {
         selected = choices_gene_names[1:2],
         # selected = c("Wnt10a", "Fzd1", "Lrp6","Ror2",
         #              "Nrp1","Nrp2","Bmpr2","Ret"),
-        choices = choices_gene_names,
+        choices = choices_cell_groups,
         server = TRUE
       )
     })

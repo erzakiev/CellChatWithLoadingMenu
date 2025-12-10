@@ -1796,13 +1796,13 @@ runCellChatApp <- function(object,...) {
       req(object_r())  # Wait for object to exist
       object_r()@netP$pathways
     })
-
+    print('line 1799 ok')
     # Also fix these - make them reactive
     choices_gene_names <- reactive({
       req(object_r())
       CellChat::extractGene(object_r()@DB)
     })
-
+    print('line 1805 ok')
     choices_pairLR_use <- reactive({
       req(object_r())
       if ("LRs" %in% names(object_r()@net)) {
@@ -1816,7 +1816,7 @@ runCellChatApp <- function(object,...) {
         LR.sig
       }
     })
-
+    print('line 1819 ok')
     # Now update observers to use the reactive expressions
     observeEvent(object_r(), {
       req(object_r())
@@ -1828,7 +1828,7 @@ runCellChatApp <- function(object,...) {
         selected = choices_cell_groups()[1]
       )
     })
-
+    print('line 1831 ok')
     observeEvent(object_r(), {
       req(object_r())
       # Update the selectInput
@@ -1839,7 +1839,7 @@ runCellChatApp <- function(object,...) {
         selected = choices_cell_groups()[2]
       )
     })
-
+    print('line 1842 ok')
     observeEvent(object_r(), {
       req(object_r())
       # Update the selectInput
@@ -1850,7 +1850,7 @@ runCellChatApp <- function(object,...) {
         selected = choices_pathways()[1]
       )
     })
-
+    print('line 1853 ok')
     observeEvent(object_r(), {
       req(object_r())
       # Update the selectInput
@@ -1861,7 +1861,7 @@ runCellChatApp <- function(object,...) {
         selected = choices_cell_groups()[2]
       )
     })
-
+    print('line 1864 ok')
     observeEvent(object_r(), {
       req(object_r())
       # Update the selectInput
@@ -1872,7 +1872,7 @@ runCellChatApp <- function(object,...) {
         selected = choices_cell_groups()[2]
       )
     })
-
+    print('line 1875 ok')
     # Also fix the selectize observers
     observe({
       req(object_r())
@@ -1884,7 +1884,7 @@ runCellChatApp <- function(object,...) {
         server = TRUE
       )
     })
-
+    print('line 1887 ok')
     observe({
       req(object_r())
       updateSelectizeInput(
@@ -1895,7 +1895,7 @@ runCellChatApp <- function(object,...) {
         server = TRUE
       )
     })
-
+    print('line 1898 ok')
     # Fix pathway selectize input too
     observe({
       req(object_r())
@@ -1907,7 +1907,7 @@ runCellChatApp <- function(object,...) {
         server = TRUE
       )
     })
-
+    print('line 1910 ok')
     # Also fix the condition check for datatype - it needs to be inside a reactive context
     output$DimPlot <- plotly::renderPlotly({
       req(object_r())
@@ -1938,7 +1938,7 @@ runCellChatApp <- function(object,...) {
           ))
       }
     })
-
+    print('line 1941 ok')
     # Also fix the other conditional outputs
     output$gene_expression_distribution <- plotly::renderPlotly({
       req(object_r())
@@ -1977,7 +1977,7 @@ runCellChatApp <- function(object,...) {
           ))
       }
     })
-
+    print('line 1980 ok')
     # output$out7 <- renderPrint(input$selectize_pairLR_use)
     if (object_r()@options$datatype == "RNA") {
       output$gene_expression_distribution2 <- plotly::renderPlotly({

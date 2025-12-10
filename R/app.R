@@ -1979,7 +1979,7 @@ runCellChatApp <- function(object,...) {
     })
     print('line 1980 ok')
     # output$out7 <- renderPrint(input$selectize_pairLR_use)
-    if (object_r()@options$datatype == "RNA") {
+    #if (object_r()@options$datatype == "RNA") {
       print('line 1983 ok')
       output$gene_expression_distribution2 <- plotly::renderPlotly({
         plotly_FeaturePlot(
@@ -2000,28 +2000,28 @@ runCellChatApp <- function(object,...) {
             height = 600
           ))
       })
-    } else {
-      print('line 2004 ok')
-      output$gene_expression_distribution2 <- plotly::renderPlotly({
-        plotly_spatialFeaturePlot(
-          object_r(),
-          pairLR.use = input$selectize_pairLR_use,
-          point.size = input$point.size_feature_plot2,
-          do.binary = input$do.binary_feature_plot,
-          cutoff = input$cut.off_feature_plot2,
-          enriched.only = F,
-          color.heatmap = input$palette_feature_plot2,
-          direction = input$direction_feature_plot2,
-          plot_nrows = as.numeric(input$nrows_feature_plot2)
-        ) %>%
-          plotly::config(toImageButtonOptions = list(
-            format = "svg",
-            filename = "spatialFeaturePlot(use pairLRs)",
-            width = 600,
-            height = 600
-          ))
-      })
-    }
+    #} else {
+    #  print('line 2004 ok')
+    #  output$gene_expression_distribution2 <- plotly::renderPlotly({
+    #    plotly_spatialFeaturePlot(
+    #      object_r(),
+    #      pairLR.use = input$selectize_pairLR_use,
+    #      point.size = input$point.size_feature_plot2,
+    #      do.binary = input$do.binary_feature_plot,
+    #      cutoff = input$cut.off_feature_plot2,
+    #      enriched.only = F,
+    #      color.heatmap = input$palette_feature_plot2,
+    #      direction = input$direction_feature_plot2,
+    #      plot_nrows = as.numeric(input$nrows_feature_plot2)
+    #    ) %>%
+    #      plotly::config(toImageButtonOptions = list(
+    #        format = "svg",
+    #        filename = "spatialFeaturePlot(use pairLRs)",
+    #        width = 600,
+    #        height = 600
+    #      ))
+    #  })
+    #}
 
     print('line 2024 ok')
     ############################################################################

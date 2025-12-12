@@ -9,7 +9,7 @@
 # #' @importFrom bsicons bs_icon
 #' @import shiny bslib shinyFiles
 #'
-runCellChatApp <- function(object,...) {
+runCellChatApp <- function(object=NULL,...) {
   # ##########################################################################
   # set some global options
   # ##########################################################################

@@ -1765,7 +1765,7 @@ runCellChatApp <- function(object,...) {
   # ##########################################################################
   server <- function(input, output, session) {
     ############################################################################
-    prefix <- '/Users/administrateur/Downloads'
+    prefix <- '/Users/administrateur/Analyses/scRNAseq/CellChatData/'
     object_r <- reactive({
       # Use req() to return NULL initially if no input yet
       # Or provide a default directly
